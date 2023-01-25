@@ -9,7 +9,7 @@ fn find_me_a_collision(mutex: Arc<Mutex<Vec<u64>>>) {
     let mut i = 0;
 
     loop {
-        // if i == 100000 {
+        // if i == 1000000000 {
         //     let mut guard = mutex.lock().unwrap();
         //     guard.push(i);
         //     break;
@@ -41,9 +41,4 @@ fn main() {
     });
 
     println!("{:#?}", mutex.lock().unwrap());
-
-    // let results = mutex.lock().unwrap();
-    // for i in results.iter() {
-    //     print!("{} ", format!("{:.3}%", (1.0 / *i as f64) * 100.0))
-    // }
 }
