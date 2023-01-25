@@ -1,17 +1,24 @@
 use std::collections::HashSet;
-use std::sync::{Arc, Mutex, MutexGuard};
+use std::sync::{Arc, Mutex};
 use std::thread;
 
 use uuid::Uuid;
 
-fn find_me_a_collision(mut guard: MutexGuard<Vec<u64>>) {
+fn find_me_a_collision(mutex: Arc<Mutex<Vec<u64>>>) {
     let mut partitions = HashSet::new();
     let mut i = 0;
 
     loop {
+        // if i == 100000 {
+        //     let mut guard = mutex.lock().unwrap();
+        //     guard.push(i);
+        //     break;
+        // }
+
         let (_, partition_id) = Uuid::new_v4().as_u64_pair();
 
         if partitions.contains(&partition_id) {
+            let mut guard = mutex.lock().unwrap();
             guard.push(i);
             break;
         }
@@ -25,13 +32,18 @@ fn main() {
     let mutex: Arc<Mutex<Vec<u64>>> = Arc::new(Mutex::new(Vec::new()));
 
     thread::scope(|s| {
-        for _ in 0..2 {
+        for _ in 0..10 {
             s.spawn(|| {
-                find_me_a_collision(mutex.lock().unwrap());
+                let mutex = mutex.clone();
+                find_me_a_collision(mutex);
             });
         }
     });
 
-    let guard = mutex.lock().unwrap();
-    println!("{:#?}", guard);
+    println!("{:#?}", mutex.lock().unwrap());
+
+    // let results = mutex.lock().unwrap();
+    // for i in results.iter() {
+    //     print!("{} ", format!("{:.3}%", (1.0 / *i as f64) * 100.0))
+    // }
 }
